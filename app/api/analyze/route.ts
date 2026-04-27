@@ -1,5 +1,7 @@
 import OpenAI from 'openai'
 
+export const dynamic = 'force-dynamic'
+
 const client = new OpenAI()
 
 export async function POST(request: Request) {
