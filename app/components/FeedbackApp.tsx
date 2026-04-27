@@ -44,8 +44,10 @@ export default function FeedbackApp() {
 
   function reset() {
     setAppState({ status: 'idle' })
+    setFeedback('')
     setActiveTab(null)
     setCopied(false)
+    // scriptFile은 유지
   }
 
   async function copyFeedback(text: string) {
@@ -60,16 +62,56 @@ export default function FeedbackApp() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg)' }}>
       <header
-        className="px-8 py-5 border-b flex items-center justify-between"
+        className="px-8 py-5 border-b flex items-center justify-between gap-6"
         style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface)' }}
       >
-        <h1 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
+        <h1 className="text-lg font-semibold tracking-tight shrink-0" style={{ color: 'var(--color-text-primary)' }}>
           배우 피드백 분리기
         </h1>
+
+        {/* 대본 — 항상 표시 */}
+        <div className="flex items-center gap-3 flex-1 justify-center">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+            className="text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-40 shrink-0"
+            style={{
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-bg)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            대본 첨부 (PDF)
+          </button>
+          {scriptFile ? (
+            <span className="text-sm flex items-center gap-2 truncate" style={{ color: 'var(--color-accent)' }}>
+              {scriptFile.name}
+              <button
+                onClick={() => { setScriptFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
+                className="hover:opacity-60 transition-opacity shrink-0"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                ✕
+              </button>
+            </span>
+          ) : (
+            <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              첨부하면 배역을 더 정확히 파악해요
+            </span>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={(e) => setScriptFile(e.target.files?.[0] ?? null)}
+          />
+        </div>
+
         {hasResult && (
           <button
             onClick={reset}
-            className="text-sm px-3 py-1.5 rounded-md transition-colors"
+            className="text-sm px-3 py-1.5 rounded-md transition-colors shrink-0"
             style={{ color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
           >
             다시 작성
@@ -80,45 +122,6 @@ export default function FeedbackApp() {
       <main className="flex-1 flex flex-col max-w-3xl w-full mx-auto px-8 py-10 gap-6">
         {!hasResult && (
           <section className="flex flex-col gap-4">
-            {/* Script upload */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isLoading}
-                className="text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-40"
-                style={{
-                  border: '1px solid var(--color-border)',
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-text-muted)',
-                }}
-              >
-                대본 첨부 (PDF)
-              </button>
-              {scriptFile ? (
-                <span className="text-sm flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
-                  {scriptFile.name}
-                  <button
-                    onClick={() => { setScriptFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
-                    style={{ color: 'var(--color-text-muted)' }}
-                    className="hover:opacity-60 transition-opacity"
-                  >
-                    ✕
-                  </button>
-                </span>
-              ) : (
-                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  첨부하면 대본 맥락으로 배역을 더 정확히 파악해요
-                </span>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf"
-                className="hidden"
-                onChange={(e) => setScriptFile(e.target.files?.[0] ?? null)}
-              />
-            </div>
-
             {/* Feedback textarea */}
             <textarea
               value={feedback}
