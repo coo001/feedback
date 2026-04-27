@@ -2,9 +2,8 @@ import OpenAI from 'openai'
 
 export const dynamic = 'force-dynamic'
 
-const client = new OpenAI()
-
 export async function POST(request: Request) {
+  const client = new OpenAI()
   const formData = await request.formData()
   const feedback = formData.get('feedback') as string | null
   const actorNamesRaw = formData.get('actorNames') as string | null
